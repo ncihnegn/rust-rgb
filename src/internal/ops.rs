@@ -120,7 +120,7 @@ macro_rules! impl_struct_ops_opaque {
             }
         }
 
-        impl<T> RelativeEq for $ty<T> where T: RelativeEq + AbsDiffEq<Epsilon=T> + Copy {
+        impl<T> RelativeEq for $ty<T> where T: RelativeEq<Epsilon=T> + Copy {
             #[inline]
             fn default_max_relative() -> T::Epsilon {
                 T::default_max_relative()
@@ -132,7 +132,7 @@ macro_rules! impl_struct_ops_opaque {
             }
         }
 
-        impl<T> UlpsEq for $ty<T> where T: UlpsEq + AbsDiffEq<Epsilon=T> + Copy {
+        impl<T> UlpsEq for $ty<T> where T: UlpsEq<Epsilon=T> + Copy {
             #[inline]
             fn default_max_ulps() -> u32 {
                 T::default_max_ulps()
@@ -364,6 +364,8 @@ impl_struct_ops_alpha! {GrayAlpha => 0 1}
 
 #[cfg(test)]
 mod test {
+    use approx::{assert_abs_diff_eq,assert_relative_eq,assert_ulps_eq};
+
     use super::*;
     const WHITE_RGB: RGB<u8> = RGB::new(255, 255, 255);
     const BLACK_RGB: RGB<u8> = RGB::new(0, 0, 0);
@@ -485,5 +487,12 @@ mod test {
         assert_eq!(s2, RGB::new(3, 4, 5));
         assert_eq!(s3, RGBA::new_alpha(3, 4, 5, 6));
         assert_eq!(s4, RGBA::new_alpha(3, 4, 5, 6));
+    }
+
+    #[test]
+    fn approx() {
+        assert_abs_diff_eq!(RGB::new(1.,1.,1.,), RGB::new(1.,1.,1.));
+        assert_relative_eq!(RGB::new(1.,1.,1.,), RGB::new(1.,1.,1.));
+        assert_ulps_eq!(RGB::new(1.,1.,1.,), RGB::new(1.,1.,1.));
     }
 }
